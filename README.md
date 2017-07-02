@@ -1,6 +1,6 @@
-Antti Koskimäki - 51301B,
-Sami Mahamoed - 544333,
-Paula Minni - 62686F
+Antti Koskimäki,
+Sami Mahamoed,
+Paula Minni
 
 # 1 - Project Goals
 
