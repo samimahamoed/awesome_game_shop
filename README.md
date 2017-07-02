@@ -169,23 +169,6 @@ The response data structure  is shown below.
 "Total price": "ID",
 }
 
-## 2.4 - Priorities
-The application main priority will be **Security** followed by **functionality** followed by **appearance** followed by **features**.
-
-# 3 - Working process and schedule for the project
-
-The main thing about our project development is that large majority of the actual coding is done individually by each of us. The combined code is then kept in GitLab, where we then update it periodically as we move along in the development. Regarding communication, we aim to make a Trello project page to help with observing the coding advancements. For more immediate project-related discussions, we'll use whatsapp, and for some larger notifications about the project, we'll also try to send emails. We'll likely divide the workload so that Antti will do presentation side and some parts of the models and views, Sami will implement API for the system and Paula will handle implementation for authentication. This is just a rough plan, though, and we all will likely to various additional tasks during the development process.
-
-Regarding the timetable, we'll aim to follow roughly the schedule below:
-
-1. 21.12.2016 – Return the finished project plan    
-2. 23.12.2016 – 2.1.2017 – Christmas break
-3. 3.1.2017 – 15.1. 2017 – Start working on the basic framework of the project and deploy some usable code to Heroku at the end of this period to test that we have a working simple web service .
-4. 16.1.2017 – 29.1.2017 – Finalize the models and views so that users/developers can be authenticated and some games could be added to the system, finish up more detailed layout for the presentation side, so we'll start to see functional web pages    
-5. 30.1.2017 – 12.2.2017 – Try to have functioning service on the Heroku (so models and views should be almost done at this point), finish up visual presentation of the website, do testing for various things such as basic security and API functionality, code a simple game for the service if time permits    
-6. 13.2.2017 – 19.2.2017 – Finishing touches, last minute testing and writing up the project report         
-7. 19.2.2017 – Return the project and after this prepare for the demo session
-
 # 4 - Testing
 
 To verify the service implementation quality, manual and automated tests will be executed as part of the project. Here, the test cases will be identified during the project implementation. However, basically the tests we plan to perform can be classified into three types as described below.  
@@ -215,7 +198,7 @@ On a high level security objectives can be divided into five topics: identity, f
 ## Risk Assessment
 For risk analysis it’s useful to identify the components that are most vulnerable for each threat category. For our application the major components are user authentication, payment integration and object ownership. Each component has its own threats which should be tested when developing the application.
 
-# 6 - Final Submission Notes:
+# 6 - Project current state:
 
 ## 6-1 What Has Been Done and How Well?
 ### Authentication
@@ -234,21 +217,6 @@ The game and service interact with each other as was instructed in the project d
 
 The views-template messaging is also done with ajax calls, so there is no need to refresh the whole page when for example loading a game. The messaging is successfully implemented as was instructed, so hopefully that warrants the 200 points or close to it from this section as the messaging was tested also with the course test game and seemed to work okay. Note that our implementation expects the settings to come in percentages which describe how large portion the iframe takes but nevertheless this could be changed easily to pixel input.
 
-### Quality of Work
-Regarding the structure of our code, we feel that our implementation is reasonably logical and additional features could be added easily (such as adding additional classes to models with additional message types to the messaging scheme and thus enabling some extra features so in that sense). We have also used the Django framework purposefully so there is a separation between the models, views and templates which enables for example switching to different page layouts without too much of a trouble. Regarding code comments, perhaps we could have done more with them, but as we use the Django framework and otherwise logical program structure and variable names, you can hopefully understand reasonably well what does what in the code, especially if you reference Django documentation when needed.
-
-When discussing the UI of the service, we feel that the basic use of our service is quite straightforward and easy, as links lead to logical places, and buttons generally note what they do on themselves and so forth. The graphical layout of the service is also clear and not cluttered to facilitate the ease of use.
-
-In regards to testing, this has perhaps not been done as well as we would have liked, but the basic functionalities of the service have been tested so that critical functions should work okay. These critical parts include checking for example that authentication works, game adding works, the cross service messaging works, games can be played, and that the database updates without problems via the views.py manipulation. All in all, there were perhaps some issues with this section, but hopefully we will still get decent points.
-
-### Non-functional requirements in addition to the project plan and demo
-For our workflow, you can check the git repository for what has been added
-and when. Unfortunately we were late of the original planned schedule, but overall  the service code was built incrementally and in logical steps so there we no big additional problems.
-
-Regarding teamwork, in addition of utilizing the project Git repository, we used Whatsapp for the immediate communication and used a Trello page to keep track of the programming tasks we needed to do and also who was doing what at which point. We worked mostly on our own, but we did have a few physical meetings to iron out some project details and to assign different tasks for different people.
-
-We don’t know how much the demo session really affects this section at this point, but hopefully we would get decent points from here in addition to points got from the demo and from the initial project plan.
-
 ### Save/load and resolution feature
 Save/load messaging is implemented as was suggested in the project description and it works decently, so hopefully this warrants the 100 points from this section or close to it.
 
@@ -256,12 +224,7 @@ Save/load messaging is implemented as was suggested in the project description a
 We have added the possibility to login either via Facebook or via GitHub, so hopefully this warrants the available points from this section..
 
 ### RESTful API
-We have implemented a straightforward RESTful API (which is the API app within the service) that can be used to get game, score and sales information from the service, where the sales data requires you authenticate. 
-
-
-
-    The system will authenticates api requests using HMAC digest authentication method.
-    The request should cointain authentication header with the following parameters
+We have implemented a straightforward RESTful API (which is the API app within the service) that can be used to get game, score and sales information from the service, where the sales data. The system will authenticates api requests using HMAC digest authentication method. Thus the request should cointain authentication header with the following parameters
     username: secret id which can be accessed through profile page
     realm: any value with (string and number only, no special character)
     nonce:unix epoch timestamp generated as utc timezone
@@ -278,21 +241,11 @@ We have implemented a straightforward RESTful API (which is the API app within t
     #thus since the qop directive is unspecified,we calculate the response as follows
     response=MD5(HA1:nonce:HA2). Hopefully this implementation warrants good points from this section.
 
-### Own game
-We have implemented two games, one simple testing game for checking the cross service messaging and a bit more complex snake game that also supports the messaging fully (so it has save/load functionality). The game files are temporarily hosted within the game service so we wouldn’t require outside hosts for the project review and demo, but if the service was to be deployed for real, they would be hosted elsewhere. Hopefully the games we did warrant the 100 points or close to it from this section.
-
 ### Mobile Friendly
 We utilize the bootstrap library for our service templates, which enables the pages to look okay with mobile devices. Hopefully this warrants some points from this section.
 
 ### Social media sharing
-We implemented a possibility to share a game in Facebook. It shares a link to the game detail page where a user can play the game or they can register and then purchase the game themselves. Also the image of the game is also shared to Facebook. Hopefully this warrants decent points from this section.
-
-## 6-2 Who Did What? (Task assignment)
-Antti: Testing, project planning and management, developing the models, developing the cross site messaging, developing simple test game and more complex game for the service.
-
-Paula: Testing, game adding, game editing and game deleting, listing all games in games page, scores page listing best 5 scores for all games, highscore listing in play page, personal highscore, social media sharing and some minor additions here and there.
-
-Sami: Testing, project planning and management,setting up project frontend structure and base templates, setting up heroku environment, Payment handling,  RESTful API implimentation, Authentication system and email validation, profile page implementation, 3rd party login, game rating system, user registration and some minor additions here and there.   
+We implemented a possibility to share a game in Facebook. It shares a link to the game detail page where a user can play the game or they can register and then purchase the game themselves. Also the image of the game is also shared to Facebook. Hopefully this warrants decent points from this section. 
 
 ## 6-3 Brief Instructions for the Service Use
 
