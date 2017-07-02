@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Example Snake game for the awesome game shop service</title>
+  <meta charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script>
+  $(document).ready(function() {
+    "use strict";
+
+    //Locahost verion
+    //var game_url = "http://localhost:8000/storefront/games/snake";
+
+    //Heroku version
+    //var game_url = "https://awesome-game-shop.herokuapp.com/storefront/games/snake";
+
+    //Simple Heroku version
+    var game_url = "*";
+
+    var message_s = {
+      messageType: "SETTING",
+      options: {
+        "width": "98%",
+        "height": "98%"
+      }
+    };
+    window.parent.postMessage(message_s,game_url)
+
+    //This is the more complex game. The game itself is just a version of the
+    //traditional snake game with added save and load functionality. You can
+    //use WSAD keys to control the snake and the score is based on how many targets
+    //you have collected. The game starts automatically and you need to click
+    //the iframe so the browser knows to enable the key controls for the game.
+
+
+
+    //Variables below note the numbers that are used in the playing field gird
+    //for elements (empty,snake,target), note snake direction codes and Keycodes
+    //that set which keyboard keys are used for control (WSAD in this case).
+    var columns_global=25;
+    var rows_global=25;
+    var empty_in_grid = 0;
+    var snake_in_grid = 1;
+    var target_in_grid = 2;
+    var dir_left = 0;
+    var dir_up = 1;
+    var dir_right = 2;
+    var dir_down = 3;
+    //Keycodes:
+    var key_left = 65;
+    var key_up = 87;
+    var key_right = 68;
+    var key_down = 83;
+
+    //Gaming field class variable, the important stuff to contain is the
+    //field dimensions and the 2-dimensional array that contains data about
+    //which type of element is in each cell of the gaming field grid.
+    //The class has also initializing function and set/get functions that
+    //set/get the desired gaming field grid cell content.
+    var game_field = {
+      width: null,
+      height: null,
+      _game_field: null,
+
+      init: function(data_value,columns1,rows1){
+        this.width = columns1;
+        this.height = rows1;
+        this._game_field = [];
+        for(var i = 0; i < columns1; i++){
+          this._game_field.push([]);
+          for(var j = 0; j < rows1; j++){
+            this._game_field[i].push(data_value);
+          }
+        }
+      },
+
+      set: function(val, x, y){
+        this._game_field[x][y] = val;
+      },
+
+      get: function(x, y){
+        return this._game_field[x][y];
+      }
+
+    }
+
+    //The snake class variable describes the moving snake objects
+    //It contains the "current" location with the last variable, direction
+    //the snake travels at the moment (left/right/up/down) and keeps track of
+    //the game score. Additionally there is the FIFO array which holds the
+    //coordinates for cells that the snake occupies at the gaming field grid
+    //at the moment. In addition the snake has initializing function, and functions
+    //to add and remove coordinates for the snake FIFO array.
+
+    var snake = {
+      direction: null,
+      last: null,
+      _snake_FIFO: null,
+      score: null,
+
+      init: function(direction1,x,y){
+        this.direction = direction1;
+        this._snake_FIFO = [];
+        this.insert(x,y);
+        this.score = 0;
+      },
+
+      insert: function(x,y){
+        this._snake_FIFO.unshift({x:x, y:y});
+        this.last = this._snake_FIFO[0];
+      },
+
+      remove: function(){
+        return this._snake_FIFO.pop();
+
+      }
+
+    }
+
+    //Function for Randomizing new target location and place to the gaming field
+    function placeTarget(){
+      var possible_places = [];
+      for(var i = 0; i < game_field.width; i++){
+        for(var j = 0; j < game_field.height; j++){
+          if(game_field.get(i,j) === empty_in_grid)
+            possible_places.push({x:i,y:j});
+        }
+      }
+      var rand_pos = possible_places[Math.floor(Math.random()*possible_places.length)];
+      game_field.set(target_in_grid, rand_pos.x, rand_pos.y);
+
+    }
+
+    // Game Objects
+    var canvas, ctx, keystate, frames;
+
+    //The main function creates the canvas element which is used to presented
+    //the gaming field graphically. Also the keyboard listeners are created here
+    //so the snake can be controlled.
+    function main(){
+      canvas = document.createElement("canvas");
+      canvas.width = columns_global*13;
+      canvas.height = rows_global*13;
+      ctx = canvas.getContext("2d");
+      document.body.appendChild(canvas);
+      frames = 0;
+      keystate = {};
+      document.addEventListener("keydown", function(evt){
+        keystate[evt.keyCode] = true;
+      });
+      document.addEventListener("keyup", function(evt){
+        delete keystate[evt.keyCode];
+      });
+
+      init();
+
+      draw();
+
+      loop();
+
+    }
+
+    //Init function is used to create empty gaming field and put the initialized snake
+    //to it (in addition a target is placed on the field).
+    function init(){
+      game_field.init(empty_in_grid, columns_global, rows_global);
+      var startpoint = {x:Math.floor(columns_global/2), y:rows_global-1};
+      snake.init(dir_up, startpoint.x, startpoint.y);
+      game_field.set(snake_in_grid, startpoint.x, startpoint.y);
+      placeTarget();
+      var input_text2 = ("SCORE : " + snake.score);
+      $("#score_text").html(input_text2);
+    }
+
+    //The loop function continues runs the game state and animation indifinetly forward,
+    //as  the requestAnimationFrame links back to the loop function as a callback.
+    function loop(){
+      update();
+      draw();
+      window.requestAnimationFrame(loop, canvas);
+    }
+
+    //The update function is used to update the game state
+    //The if clauses at the top change the snake direction if corresponding
+    //key is pressed and for each 8th animation frame, the actual state
+    //is updated. In this the snake direction can change according to new
+    //direction, the game can end if the snake hit a wall or itself, the snake
+    //and it's score can grow if a target was hit and finally the snake can go
+    //on if either of the previous happened.
+    function update(){
+      frames++;
+      if(keystate[key_left] && (snake.direction !== dir_right)){
+        snake.direction = dir_left;
+      }
+      if(keystate[key_right] && (snake.direction !== dir_left)){
+        snake.direction = dir_right;
+      }
+      if(keystate[key_up] && (snake.direction !== dir_down)){
+        snake.direction = dir_up;
+      }
+      if(keystate[key_down] && (snake.direction !== dir_up)){
+        snake.direction = dir_down;
+      }
+
+      if(frames%8 === 0){
+        var nx = snake.last.x;
+        var ny = snake.last.y;
+        switch (snake.direction){
+          case dir_left:
+            nx--;
+            break;
+          case dir_right:
+            nx++;
+            break;
+          case dir_up:
+            ny--;
+            break;
+          case dir_down:
+            ny++;
+            break;
+        }
+
+
+        if ((nx < 0 )||(ny < 0)||(nx > (game_field.width-1) )||(ny > (game_field.height-1))||(game_field.get(nx,ny) === snake_in_grid)){
+          var message = {
+            messageType: "SCORE",
+            score: snake.score
+          };
+          window.parent.postMessage(message,game_url)
+          return init();
+        }
+
+        if (game_field.get(nx, ny) === target_in_grid){
+          var derp_tail = {x:nx, y:ny};
+          game_field.set(snake_in_grid, derp_tail.x, derp_tail.y);
+          snake.insert(derp_tail.x, derp_tail.y);
+          placeTarget();
+          snake.score++;
+          var input_text = ("SCORE : " + snake.score);
+          $("#score_text").html(input_text);
+
+        }
+        else{
+          var temp_tail = snake.remove();
+          game_field.set(empty_in_grid, temp_tail.x, temp_tail.y);
+          temp_tail.x = nx;
+          temp_tail.y = ny;
+          game_field.set(snake_in_grid, temp_tail.x, temp_tail.y);
+          snake.insert(temp_tail.x, temp_tail.y);
+        }
+
+
+      }
+    }
+    //The below function draws the gaming field state to the canvas.
+    function draw(){
+      var targetw = canvas.width/game_field.width;
+      var targeth = canvas.height/game_field.height;
+
+
+      for(var x = 0; x < game_field.width; x++){
+        for(var y = 0; y < game_field.height; y++){
+          switch(game_field.get(x,y)){
+              case empty_in_grid:
+                ctx.fillStyle = "#fff";
+                break;
+              case snake_in_grid:
+                ctx.fillStyle = "#0f0";
+                break;
+              case target_in_grid:
+                ctx.fillStyle = "#f00";
+                break;
+
+          }
+          ctx.fillRect(x*targetw, y*targeth, targetw, targeth);
+        }
+
+      }
+    }
+    main();
+
+    //Below is the cross site messaging that sends settings to the parent window
+    //at the start, and can be used to save the game state and send it too to
+    //the parent when the save button is clicked. Finally the gamestate can
+    //be loaded with the load button, that send a load request to the parent which
+    //then returns the game state. The return messagetypes are logged to console.
+
+    $(window).on('message', function(evt) {
+        var data = evt.originalEvent.data;
+        switch (data.messageType){
+          case "ERROR":
+            console.log(data.info);
+            break;
+
+          case "LOAD":
+            console.log(data.messageType);
+            var temp_gamestate = data.gameState;
+            var temp_fifo = JSON.parse(temp_gamestate.snake_fifo);
+            game_field.init(empty_in_grid, columns_global, rows_global);
+            snake.init(temp_gamestate.direction, temp_fifo[0].x,temp_fifo[0].y)
+            snake._snake_FIFO = temp_fifo.slice();
+            game_field.set(target_in_grid, temp_gamestate.target.x, temp_gamestate.target.y);
+            for(var z = 0;  z < temp_fifo.length; z++){
+              game_field.set(snake_in_grid, temp_fifo[z].x, temp_fifo[z].y);
+            }
+            snake.score = temp_gamestate.score;
+            var input_text3 = ("SCORE : " + snake.score);
+            $("#score_text").html(input_text3);
+            break;
+
+          case "SAVE_SUCCESS":
+            console.log(data.messageType);
+            break;
+
+          case "SCORE_SUCCESS":
+            console.log(data.messageType);
+            break;
+
+          case "ACHIEVEMENT_SUCCESS":
+            console.log(data.messageType);
+            break;
+
+          default:
+            console.log("Error - Wrong type of incoming message");
+        }
+      });
+
+      $("#button1").click(function() {
+        var temp_target = {"x":0, "y":0};
+        for(var i = 0; i < game_field.width; i++){
+          for(var j = 0; j < game_field.height; j++){
+            if(game_field.get(i,j) === target_in_grid)
+              temp_target.x = i;
+              temp_target.y = j;
+          }
+        }
+        var temp_last = {"x":snake.last.x, "y":snake.last.y};
+        var snake_fifo_temp = snake._snake_FIFO.slice();
+        var snake_fifo_final = JSON.stringify(snake_fifo_temp);
+
+        var gamestate_normal = { "score" : snake.score,
+                                 "direction" : snake.direction,
+                                 "target" : temp_target,
+                                 "last" : temp_last,
+                                 "snake_fifo" : snake_fifo_final
+        };
+
+        //var gamestate_json_string = JSON.stringify(gamestate_normal);
+        var message = {
+          messageType: "SAVE",
+          gameState: gamestate_normal
+        };
+        window.parent.postMessage(message,game_url)
+      });
+
+      $("#button2").click(function() {
+        var message = {
+          messageType: "LOAD_REQUEST"
+        };
+        window.parent.postMessage(message,game_url)
+      });
+
+
+
+  });
+  </script>
+
+  <style>
+    canvas {
+      border : 1px solid #000;
+      margin : auto;
+    }
+    #game_title_v1 {
+      color : green;
+      font-family : Impact;
+      white-space : nowrap;
+    }
+    #score_text {
+      white-space : nowrap;
+    }
+  </style>
+</head>
+
+<body>
+<h1 id="game_title_v1">
+----Snakiest Snake Game----
+</h1>
+<h4 id="score_text">
+SCORE : 0
+</h4>
+<button id="button1" type="button" style="height: 50px; width: 50px;">Save</button>
+<button id="button2" type="button" style="height: 50px; width: 50px;">Load</button>
+<p>
+Click the game window to enable controls!
+W-S-A-D keys turn the snake to up-down-left-right.
+</p>
+</body>
+</html>

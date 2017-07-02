@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{%block title %} Profile {% endblock %}
+{% block content %}
+{% load static %}
+<script src="{% static 'app_js/ajax_form_submission.js' %}" async></script>
+<script src="{% static 'app_js/views.js' %}" async></script>
+
+
+
+
+    <div class="row"><br></div>
+     <div class="container">
+         {% if error_msg %}
+           <div class="alert alert-danger alert-dismissable">
+              <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+              <strong>Error:</strong> {{error_msg}}
+           </div>
+         {% endif %}
+       <div class="row">
+         <div class="col-md-4">
+           <div class="row">
+             <div class="col-md-12">
+
+               <img src="/{{ profile_img_path.url }}" class="center-block img-responsive img-thumbnail" id = "profile_img">
+                <button class="btn btn-block btn-primary btn-sm bottom_zero" data-toggle="modal" data-target="#profile_img_uploader"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span>  Uplaod</button>
+             </div>
+           </div>
+           <div class="row ">
+               <!-- Modal -->
+            <div class="modal fade" id="profile_img_uploader" role="dialog">
+             <div class="modal-dialog">
+
+               <!-- Modal content-->
+               <div class="modal-content">
+                 <div class="modal-header">
+                   <button type="button" class="close" data-dismiss="modal">&times;</button>
+                   <h4 class="modal-title">Upload your profile image</h4>
+                 </div>
+                 <div class="modal-body">
+                     <img src="/{{ profile_img_path.url }}" class="center-block img-responsive img-thumbnail" id = "profile_img_modal">
+
+                     <form class="form-horizontal bottom_zero" role="form" action="" method="post" enctype="multipart/form-data" id ="profile_img_upload">
+                           {% csrf_token %}
+                           <div class ="pull-left" ><input id="id_profile_img_path" name="profile_img_path" type="file" /></div>
+                          <!--ajax -->
+                          <button class="btn btn-block btn-primary btn-sm"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span>  Uplaod</button>
+                     </form>
+
+                 </div>
+
+               </div>
+
+             </div>
+            </div>
+
+           </div>
+         </div>
+         <div class="col-md-8">
+             <form role="form" action="" method="post" id ="profile_user_info">
+                 {% csrf_token %}
+
+                 <div class="form-group">
+                     <!-- Here there would be form error because its the -->
+                     <label class="control-label" for="profile_username">Username</label>
+                     <input class="form-control" id="profile_username" value="{{ data.username }}" type="text">
+                 </div>
+                 <div class="form-group">
+                     <!-- Here there would be form error because its the -->
+                     <label class="control-label" for="profile_firstname">First Name</label>
+                     <input class="form-control" id="profile_firstname" value="{{ data.first_name }}" type="text">
+                 </div>
+                 <div class="form-group">
+                     <!-- Here there would be form error because its the -->
+                     <label class="control-label" for="profile_lastname">Last Name</label>
+                     <input class="form-control" id="profile_lastname" value="{{ data.last_name }}" type="text">
+                 </div>
+                 <div class="form-group">
+                     <!-- Here there would be form error because its the -->
+                     <label class="control-label" for="profile_email">Email</label>
+                     <input class="form-control" id="profile_email" value="{{ data.email }}" type="text">
+                 </div>
+
+                 <hr>
+             <button type="submit" class="btn btn-default">Save</button>
+           </form>
+           <div id="results"></div>
+         </div>
+
+       </div>
+       <div class="pull-right">
+         <a href="#" class="btn-sm btn-success " id = "my_games"><i>My Games</i></a>
+
+
+         <a href="#" class="btn-sm btn-success" id = "sales"><i>Sales</i></a>
+
+
+         <a href="#" class="btn-sm btn-success" id = "contributions"><i>contributions</i></a>
+       </div>
+       <hr>
+     </div>
+
+
+
+   <div class="row"><br></div>
+
+ {% if contributions %}
+   <!-- Modal -->
+<div class="modal fade" id="api_access" role="dialog">
+ <div class="modal-dialog">
+
+
+     <div class="modal-body col-md-12">
+
+         <div class="col-md-12">
+
+             <form role="form" action="" method="post" id ="access_keys">
+                 {% csrf_token %}
+
+                 <div class="form-group">
+                     <!-- Here there would be form error because its the -->
+                     <label class="control-label" for="sid"></label>
+                     <input class="form-control" id="sid" value="Secret id:{{ data.sid }}" type="text">
+                 </div>
+                 <div class="form-group">
+                     <!-- Here there would be form error because its the -->
+
+                     <input class="form-control" id="skey" placeholder="Secret key" value="Secret key: {{ data.skey }}" type="text">
+                 </div>
+
+
+             <button type="submit" class="btn btn-default">Regenerate </button> &nbsp&nbsp&nbsp<button type="submit" class="btn btn-default" data-dismiss="modal">close </button>
+
+
+           </form>
+            <br>
+           <div id="key_result"></div>
+
+
+         </div>
+
+     </div>
+
+
+
+ </div>
+</div>
+{%endif%}
+     <div class="container">
+    {% if contributions %}
+     <div class="row">
+       <div class="col-md-2 col-xs-11 pull-right">
+         <button class="btn btn-block btn-sm btn-default" data-toggle="modal" data-target="#api_access">Access key</button>
+       </div>
+     </div>
+     {%endif%}
+       <div class="row">
+         <div class="col-md-2 col-xs-11 pull-right">
+           <a href="{% url 'addgame' %}" class="btn btn-block btn-sm btn-warning">Add New Game</a>
+         </div>
+       </div>
+       <div class="row">
+         <div class="col-md-2 col-xs-11 pull-right">
+           <a href="{% url 'storefront:games' %}" class="btn btn-block btn-sm btn-success">Browse games</a>
+         </div>
+       </div>
+       <div class="row">
+         <div class="col-md-12" id = "my_games_tb">
+           <div class="panel panel-primary">
+             <div class="panel-heading">
+               <h3 class="panel-title" draggable="true">My Games</h3>
+             </div>
+             <div class="panel-body">
+               <table class="table table-condensed">
+                 <thead>
+                   <tr>
+                     <th>Title</th>
+                     <th>Description</th>
+                     <th></th>
+                     <th></th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                     {% for game in games %}
+                   <tr>
+                     <td>{{game.name}}</td>
+                     <td>{{game.description}}</td>
+                     <td></td>
+                     <td>
+                        <a href="{% url 'storefront:game_detail' game.id %}" class="btn-primary btn-sm pull-right" role="button">View Details</a>
+                     </td>
+                   </tr>
+                   {%endfor%}
+                 </tbody>
+               </table>
+             </div>
+           </div>
+         </div>
+       </div>
+       <div class="row" >
+         <div class="col-md-12" id = "sales_tb">
+           <div class="panel panel-primary">
+             <div class="panel-heading">
+               <h3 class="panel-title">Sales</h3>
+             </div>
+
+             <div class="panel-body">
+               <table class="table table-condensed">
+                 <thead>
+                   <tr>
+                     <th>Payment referance</th>
+                     <th>Customer</th>
+                     <th colspan="2">Payment description </th>
+
+                     <th><p class="pull-right"> Amount</p></th>
+
+                   </tr>
+                 </thead>
+                 <tbody>
+                     {%if not sales == None %}
+
+                     {% for payment in sales %}
+                   <tr>
+                     <td>{{payment.ref}}</td>
+                     <td>{{payment.customer}}</td>
+                     <td colspan="2">
+                            <a href="{% url 'storefront:game_detail' payment.game.id %}" ><i>{{payment.game.name}} ,&nbsp;</i></a> {{payment.game.description}}
+                     </td>
+
+                     <td>
+                       <p class="pull-right">{{payment.paid_amount}}</p>
+                     </td>
+                   </tr>
+                   {%endfor%}
+                   {%endif%}
+                   <tr>
+                     <th></th>
+                     <th></th>
+                     <th> </th>
+                     <th></th>
+                     <th> <p class="panel-heading panel-info pull-right">
+                       <strong>Total sales :</strong><i> {{total}}</i>
+                      </p></th>
+                   </tr>
+                 </tbody>
+               </table>
+             </div>
+           </div>
+         </div>
+       </div>
+
+       <div class="row" >
+         <div class="col-md-12" id = "contributions_tb">
+           <div class="panel panel-primary">
+             <div class="panel-heading">
+               <h3 class="panel-title">Games You added</h3>
+             </div>
+             <div class="panel-body">
+               <table class="table table-condensed ">
+                 <thead>
+                   <tr>
+                     <th>Title</th>
+                      <th>Description</th>
+                      <th colspan="2">Url</th>
+                     <th></th>
+                      <th></th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                     {%if not contributions == None %}
+
+                     {% for game in contributions %}
+                   <tr>
+                     <td>{{game.name}}</td>
+                     <td>{{game.description}}</td>
+                     <td colspan="2">
+                         {{game.url}}
+                     </td>
+
+                      <td >
+                        <a href="{% url 'editgame' game.id%}" class="btn-primary btn-sm pull-right" role="button">Edit</a>
+                     </td>
+                     <td >
+                        <form action="{% url 'deletegame' game.id%}" method="post">
+                          {% csrf_token %}
+                          <button class="btn-danger btn-sm pull-right" type="submit">Delete</button>
+                        </form>
+
+                     </td>
+                   </tr>
+                   {%endfor%}
+                   {%endif%}
+                 </tbody>
+               </table>
+             </div>
+           </div>
+         </div>
+       </div>
+
+       <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+   </div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	{% for game in games %}
+	<div class="col-sm-10 col-md-10 cal-lg-10">
+
+       <div class="navbar navbar-default navbar-static-top">
+		 <div class="navbar-header">
+   			<img height="40" width="60" alt="Brand" src="/{{ game.image.url }}"></a>
+			<figcaption class="figure-caption  pull-right ">
+				<h4 class="pull-left"><strong>&nbsp;&nbsp;&nbsp;&nbsp;<i>{{ game.name }}</i></strong></h4>
+
+			</figcaption>
+   	    </div>
+
+	   </div>
+		<ol>
+
+
+			<div class="row">
+			  <div class="col-md-12">
+				<div class="panel panel-heading">
+
+				  <div class="panel-body">
+					<table class="table table-condensed">
+					  <thead>
+						<tr>
+						  <th>Player</th>
+						  <th>Score</th>
+						  <th>Date</th>
+						</tr>
+					  </thead>
+					  <tbody>
+						  {%for scores in game.highscores%}
+						<tr>
+						  <td >{{scores.player_nickname}}</td>
+						  <td>
+							 {{scores.score}}
+						  </td>
+						  <td>
+							  {{scores.modified}}
+						  </td>
+
+						</tr>
+						{%endfor%}
+						<tr>
+						  <td></td>
+						  <td>
+
+						  </td>
+						</tr>
+					  </tbody>
+					</table>
+				  </div>
+				</div>
+			  </div>
+			</div>
+
+		</ol>
+	</div>
+{% endfor %}
+
+{% endblock %}

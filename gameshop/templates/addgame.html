@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{%block title %} Register {% endblock %}
+
+{%block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading ">
+
+                {% if form.instance.id %}
+                    <h4><i>Edit Game</i></h4>                                    
+                {% else %}
+                    <h4><i>Add Game</i></h4>
+                {% endif %}
+                </div>
+                {% if error_msg %}
+                  <div class="alert alert-danger">
+                  <strong>Error : </strong> {{error_msg}}
+                  </div>
+                {% endif %}
+
+                <div class="panel-body">
+
+
+                    <form class="form-horizontal" role="form" action="" enctype="multipart/form-data" method="post">
+                        {% csrf_token %}
+                        {% include 'form.html' %}
+                        <div class="form-group">
+                            <div class="col-sm-offset-1  col-sm-10">
+                                <button type="submit" class="btn btn-primary">Save Game</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}

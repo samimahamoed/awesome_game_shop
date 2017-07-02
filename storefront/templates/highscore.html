@@ -1,0 +1,27 @@
+
+   
+ <div class="panel-body">
+
+    {% for score in highscores %}
+     <div class="alert alert-info">
+        <strong>{{score.player.user}}</strong> {{score.score}}
+     </div>
+    {%endfor%}
+
+    </div>
+    <div class="panel-heading ">
+
+     <h4><i>My Highscore</i></h4>
+
+   </div>
+
+   <div class="panel-body">
+
+
+    {% if personal_highscore %}
+    <div class="alert alert-info">
+        <strong>{{personal_highscore.player.user}}</strong> {{personal_highscore.score}}
+     </div>
+    {%endif%}
+
+     </div>

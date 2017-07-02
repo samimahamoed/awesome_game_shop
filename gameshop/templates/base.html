@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}Online Game Shope{% endblock %}</title>
+    <!--only what we need on all page-->
+    {% block meta %} {% endblock %}
+    {%load static %}
+    <!TODO : download all links ?  >
+    <!--link rel = "stylesheet" type="text/css" href = "{% static 'bootstrap-4.0.0-alpha.6-dist/css/bootstrap.css' %}" /-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel = "stylesheet" type="text/css" href = "{% static 'style/style.css' %}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link href='http://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+      {% block login_status %}
+          <nav class="navbar navbar-inverse">
+
+              <div class="container-fluid">
+                  <div class="navbar-header navbar-brand pull-left">
+                      <p>Imaginary awesome games buy and play online</p>
+                  </div>
+
+                  <ul class="nav navbar-nav navbar-right">
+
+
+                          {% if user.is_authenticated %}
+                          <li class="pull-right">
+                             <a href="{% url 'logout' %}">
+                                   <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>&nbsp;logout
+                             </a>
+                          </li>
+
+                          <li class="pull-right">
+                             <a href="{% url 'profile' %}">
+                                   <span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;{{user.username}}
+                             </a>
+                          </li>
+
+                          {% else %}
+                              <li class="pull-right">
+                                 <a href="{% url 'login' %}">
+                                       <span class="glyphicon glyphicon-film" aria-hidden="true"></span>&nbsp;login
+                                 </a>
+                              </li>
+                          {% endif %}
+
+
+                  </ul>
+              </div>
+          </nav>
+      {% endblock %}
+      <nav class="navbar navbar-inverse">
+
+          <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#site_navbar">
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
+
+              <!--a class="navbar-brand" href="{% url '' % }">GAME SHOPE</a-->
+
+              <a href="/" class="navbar-brand">
+                    <span class="glyphicon glyphicon-film" aria-hidden="true"></span>&nbsp;AWESOME GAME SHOPE &nbsp;&nbsp;&nbsp;&nbsp;
+              </a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="site_navbar">
+              <ul class="nav navbar-nav">
+                  <li class="">
+                      <a href="{% url 'storefront:games' %}">
+                            <span class="glyphicon glyphicon-film" aria-hidden="true"></span>&nbsp;Games
+                      </a>
+                  </li>
+
+                  <li class="">
+                      <a href="{% url 'storefront:scores' %}">
+                            <span class="glyphicon glyphicon-film" aria-hidden="true"></span>&nbsp;Scores
+                      </a>
+                  </li>
+              </ul>
+
+
+          </div>
+
+
+      </nav>
+
+
+
+        {% block sidebar %}
+
+        {% endblock %}
+
+        {% block header %}
+
+        {% endblock %}
+
+        {% block content %}
+
+        {% endblock %}
+
+        {% block footer %}
+        <footer>
+
+            <div class="navbar navbar-inverse navbar-fixed-bottom">
+                {%if search_enable %}
+                <form class="col-lg-12 margin_top_5px" role="search" method="POST" action="{% url 'storefront:search_games' %}">
+                    {% csrf_token %}
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                   <div class="input-group ">
+                     <span class="input-group-btn">
+                       <button class="btn btn-default" type="submit" ><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                     </span>
+                     <input type="text" name="game_search" class="form-control" placeholder="Search games ...">
+                   </div>
+                 </div>
+                </form>
+
+                {%endif%}
+            </div>
+
+
+        </footer>
+        {% endblock %}
+
+    </br></br></br></br></br></br></br></br></br></br>
+  </body>
+</html>

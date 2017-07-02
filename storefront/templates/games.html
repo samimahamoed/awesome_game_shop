@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	{% for game in games %}
+	<div class="col-sm-10 col-md-3 cal-lg-3">
+	  <div class="row">
+		<div class="col-md-12 ">
+			   <br>
+			   <figure class="thumbnail">
+				   <a href="{% url 'storefront:game_detail' game.id %}">
+					   {% if game.image %}
+						   <img src="/{{ game.image.url }}" class="figure-img img-fluid rounded img-responsive" height="600" width="300">
+					   {% endif %}
+				   </a>
+				   <figcaption class="figure-caption">
+					   <h4><strong>{{ game.name }}</strong></h4>
+					   <p> {{ game.description }}</p>
+
+					   {% if game.price == 0 %}
+					    <!-- TODO: i think the user must go through payment process even if the game is free-->
+						   <p>Free to play!</p>
+					   {% else %}
+
+						   <p>Buy for {{ game.price }} €</p>
+					   {% endif %}
+
+				   </figcaption>
+			   </figure>
+
+			   <!--TOD lets have ratting data a-->
+			   <div type="button" class="pull-left">
+				   {%for value in "xxxxx"%}
+				   <a href="#" id ="star_{{forloop.counter}}">
+					   {%if game.rating >= forloop.counter%}
+
+						  <span  class="glyphicon glyphicon-star active" aria-hidden="true"></span>
+					   {% else %}
+						   <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+					   {%endif%}
+				   </a>
+				   {%endfor%}
+				 <!--span class="glyphicon glyphicon-star active" aria-hidden="true"></span>
+				 <span class="glyphicon glyphicon-star active" aria-hidden="true"></span>
+				 <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+				 <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+				 <span class="glyphicon glyphicon-star" aria-hidden="true"></span-->
+			   </div>
+			   <a href="{% url 'storefront:game_detail' game.id %}" class="btn-primary btn-sm pull-right" role="button">View Details</a>
+
+		</div>
+	  </div>
+	</div>
+{% endfor %}
+
+{% endblock %}

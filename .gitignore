@@ -1,0 +1,7 @@
+venv
+taticfiles
+.env.pyc
+staticfiles
+.env
+*.pyc
+.DS_Store

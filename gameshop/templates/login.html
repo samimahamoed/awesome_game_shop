@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="panel panel-default">
+
+              <div class="panel-heading ">
+                <h4><i>Login Form</i></h4>
+              </div>
+              {% if error_msg %}
+                <div class="alert alert-danger alert-dismissable">
+                   <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                   <strong>Error:</strong> {{error_msg}}
+                </div>
+              {% endif %}
+
+              {% if info %}
+                <div class="alert alert-info alert-dismissable">
+                   <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    {{info.msg}}
+                </div>
+              {% endif %}
+                <div class="panel-body">
+                    <br>
+                    <form class="form-horizontal" role="form" action="" method="post">
+                        {% csrf_token %}
+                        {% include 'form.html' %}
+                        <div class="form-group">
+                            <br>
+                            <div class="col-sm-offset-1 col-sm-10">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-footer">
+                     {% load socialaccount %}
+                    <i>Login with    </i>  : <a href="{% provider_login_url "facebook" method="oauth2" next = redirect_url %}"><i class="fa fa-facebook-square" style="font-size:24px"> <i style="font-size:14px"> facebook</i>   | </i></a>
+                    <a href="{% provider_login_url "github" method="oauth2" next = redirect_url %}"><i class="fa fa-github" style="font-size:24px"> <i style="font-size:14px"> GitHub</i></i></a>
+                </div>
+                <div class="panel-footer">
+                     No account? <a href="{% url 'register' %}">Register</a> for new one.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

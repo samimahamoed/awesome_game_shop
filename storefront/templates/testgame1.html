@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Test game 1</title>
+<meta charset="utf-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+//This is basically just a test "game" for observing that the cross site messaging works.
+//The gamestate consists of how many times the click me-button which can be saved and
+//sent to the game service and in turn returned and used to load a game. additional
+//Buttons can be used to test different types of messages.
+$(document).ready(function() {
+  "use strict";
+  var derp = 0;
+
+  //Locahost verion
+  //var game_url = "http://localhost:8000/storefront/games/testgame1";
+
+  //Heroku version
+   //var game_url = "https://awesome-game-shop.herokuapp.com/storefront/games/testgame1";
+
+   //Simple Heroku version
+   var game_url = "*";
+
+  $(window).on('message', function(evt) {
+      var data = evt.originalEvent.data;
+      switch (data.messageType){
+        case "ERROR":
+          alert(data.info);
+          break;
+
+        case "LOAD":
+
+          var temppis = data.gameState;
+          alert(data.messageType);
+          $("#change1").html(temppis.score);
+          derp = temppis.score
+          break;
+
+        case "SAVE_SUCCESS":
+          alert(data.messageType);
+          break;
+
+        case "SCORE_SUCCESS":
+          alert(data.messageType);
+          break;
+
+          case "ACHIEVEMENT_SUCCESS":
+            alert(data.messageType);
+            break;
+
+        default:
+          alert("Wrong type of incoming message");
+      }
+
+  });
+
+  var message_s = {
+    messageType: "SETTING",
+    options: {
+      "width": "80%",
+      "height": "80%"
+    }
+  };
+  window.parent.postMessage(message_s,game_url)
+
+  $("#button1").click(function() {
+    derp = derp + 1;
+    $("#change1").html(derp);
+  });
+
+  $("#button2").click(function() {
+    var message = {
+      messageType: "SCORE",
+      score: derp
+    };
+    window.parent.postMessage(message,game_url)
+    derp = 0;
+    $("#change1").html(derp);
+  });
+
+  $("#button3").click(function() {
+    var gamestate_normal = { "score" : derp };
+    //var gamestate_json_string = JSON.stringify(gamestate_normal);
+    var message = {
+      messageType: "SAVE",
+      gameState: gamestate_normal
+    };
+    window.parent.postMessage(message,game_url)
+  });
+
+  $("#button4").click(function() {
+    var message = {
+      messageType: "LOAD_REQUEST"
+    };
+    window.parent.postMessage(message,game_url)
+  });
+
+  $("#button5").click(function() {
+    var message = {
+      messageType: "ACHIEVEMENT"
+    };
+    window.parent.postMessage(message,game_url)
+  });
+  $("#button6").click(function() {
+    var message = {
+      messageType: "UNKNOWN"
+    };
+    window.parent.postMessage(message,game_url)
+  });
+
+
+});
+</script>
+</head>
+
+<body>
+  <div>
+    <p>
+
+    </p>
+    <h1>
+    Simple interactive "game" for testing cross-site messaging
+    </h1>
+      <p>
+      Increasing counter - Add to it by pressing the button:
+      </p>
+      <p id="change1" style="font-weight: bold; font-size: 200%">
+      0
+      </p>
+      <button id="button1" type="button" style="height: 100px; width: 100px;">Click me!</button>
+      <p>
+      Buttons below test cross site messaging:
+      </p>
+      <button id="button2" type="button" style="height: 100px; width: 150px;">End game (sends score and resets game)</button>
+      <button id="button3" type="button" style="height: 100px; width: 150px;">Save game (sends game state and score)</button>
+      <button id="button4" type="button" style="height: 100px; width: 150px;">Load game (request load)</button>
+      <button id="button5" type="button" style="height: 100px; width: 150px;">Achievement (enable achievement)</button>
+      <button id="button6" type="button" style="height: 100px; width: 150px;">Test erroneous msg</button>
+
+  </div>
+
+</body>
+
+</html>

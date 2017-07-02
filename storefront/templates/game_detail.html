@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{%block title %} Profile {% endblock %}
+{% block content %}
+{% load static %}
+<script src="{% static 'app_js/ajax_form_submission.js' %}" async></script>
+
+
+
+
+    <div class="row"><br></div>
+     <div class="container">
+           {% if error_msg %}
+               <div class="alert alert-danger alert-dismissable">
+                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  <strong>Error:</strong> {{error_msg}}
+               </div>
+           {% endif %}
+           {% if info_msg %}
+             <div class="alert alert-info alert-dismissable">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Info:</strong> {{info_msg}}
+             </div>
+           {% endif %}
+
+
+           {%for game in user_game %}
+               <div class="alert alert-danger alert-dismissable">
+                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  <strong>Error:</strong> {{game.name}}
+               </div>
+           {%endfor%}
+
+       <div class="row">
+         <div class="col-sm-10 col-md-3 cal-lg-3">
+           <div class="row">
+             <div class="col-md-12 ">
+             		<br>
+             		<figure class="thumbnail">
+             				{% if game.image %}
+                                {% load static from staticfiles %}
+             					<img src="/{{ game.image.url }}" class="figure-img img-fluid rounded img-responsive" height="400" width="300">
+             				{% endif %}
+             			<figcaption class="figure-caption">
+             				<h4><strong>{{ game.name }}</strong></h4>
+             				<p> {{ game.description }}</p>
+
+             				{% if game.price == 0 %}
+             					<p>Free to play!</p>
+             				{% else %}
+             					<p>Buy for {{ game.price }} €</p>
+             				{% endif %}
+
+             			</figcaption>
+             		</figure>
+
+                    <!--TOD lets have ratting data a-->
+                    <div type="button" class="pull-left">
+                        {%for value in "xxxxx"%}
+                        <a href="#" id ="star_{{forloop.counter}}">
+                            {%if rating >= forloop.counter%}
+
+                               <span  class="glyphicon glyphicon-star active" aria-hidden="true"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                            {%endif%}
+                        </a>
+                        {%endfor%}
+                  </div>
+                   {%if game_already_paid %}
+                   <a href="{% url 'storefront:play' game.id %}" class="btn-primary btn-sm pull-right" role="button">Play The game</a>
+                   {%endif%}
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-12 col-md-9 col-lg-9">
+             <div class="row">
+               <div class="col-md-12">
+                 <div class="panel panel-primary">
+
+                   <div class="panel-body">
+                     <table class="table table-condensed">
+                       <thead>
+                         <tr>
+                           <th>Player</th>
+                           <th>Score</th>
+                           <th>Date</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                           {%for scores in highscores%}
+                         <tr>
+                           <td >{{scores.player_nickname}}</td>
+                           <td>
+                              {{scores.score}}
+                           </td>
+                           <td>
+                               {{scores.modified}}
+                           </td>
+
+                         </tr>
+                         {%endfor%}
+                         <tr>
+                           <td></td>
+                           <td>
+
+                           </td>
+                         </tr>
+                       </tbody>
+                     </table>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           <div id="results"></div>
+
+         </div>
+       </div>
+       <hr>
+     </div>
+
+
+
+   <div class="row"><br></div>
+
+
+     <div class="container">
+         <div class="col-md-2 col-xs-11 pull-right">
+           <a href="{% url 'storefront:games' %}" class="btn btn-block btn-warning btn-sm">Browse More games</a>
+         </div>
+
+         <div class="col-md-2 col-xs-11 pull-right">
+             {%if not game_already_paid %}
+             <button class="btn btn-block btn-success btn-sm bottom_zero"
+             data-toggle="modal" data-target="#checkout_summary"> Buy This Game </button>
+             {% else %}
+             <button class="btn btn-block btn-default btn-sm bottom_zero"
+             data-toggle="modal" data-target="#checkout_summary" disabled> Buy This Game </button>
+             {% endif %}
+         </div>
+
+       </div>
+
+       <div class="row ">
+           <!-- Modal -->
+        <div class="modal fade" id="checkout_summary" role="dialog">
+         <div class="modal-dialog">
+
+           <!-- Modal content-->
+           <div class="modal-content">
+
+             <div class="modal-body ">
+
+                                 <div class="row">
+                                     <div class="col-md-12 col-lg-12 ">
+                                         <h2><strong><i>{{game.name}}</i></strong></h2>
+                                         <p><strong>Description: </strong>{{game.description}} </p>
+                                         <p><strong>Price: </strong> {{game.price}} € </p>
+                                         <p><strong>Discount: </strong> {{payment.discount}}€ </p>
+                                     </div>
+                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 text-center pull-right well margin_side">
+
+
+                                             <span style="font-size:47px; ">Amount</span>
+                                             <span class="total_price">{{payment.amount}}</span>
+
+                                     </div>
+                                 </div>
+
+
+
+             </div>
+             {%if game_already_paid %}
+             <div class='alert alert-info alert-dismissable'><a href='#'
+               class='close' data-dismiss='alert' aria-label='close'>&times;</a>
+               <strong>Info!</strong> Game is already payid no need to pay again</div>
+             {%elif not user.is_authenticated %}
+             <div class='alert alert-warning alert-dismissable'><a href='#'
+               class='close' data-dismiss='alert' aria-label='close'>&times;</a>
+               <strong>Warning!</strong> you need to  <a href="{% url 'login' %}?next={{request.path}}">
+                      <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>&nbsp;login
+                </a> to proceed with this payment</div>
+              {%endif%}
+             <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
+                              {% csrf_token %}
+                             {%if user.is_authenticated and not game_already_paid %}
+                             <form class="form-horizontal" role="form" action="http://payments.webcourse.niksula.hut.fi/pay/" method="post" id ="proceed_to_payment">
+                                <input type="hidden" name="pid" value="{{payment.pid}}" />
+                                <input type="hidden" name="sid" value="{{payment.sid}}" />
+                                <input type="hidden" name="success_url"
+                                        value="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{% url 'storefront:payment_success'%}" />
+                                <input type="hidden" name="cancel_url"
+                                        value="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{% url 'storefront:payment_cancel' %}" />
+                                <input type="hidden" name="error_url"
+                                        value="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.META.HTTP_HOST }}{% url 'storefront:payment_error' %}" />
+                                <input type="hidden" name="checksum"
+                                        value="{{payment.checksum}}" />
+                                <input type="hidden" name="amount" value="{{payment.amount}}" />
+                                <input class="btn btn-primary " type="submit" value="Proceed to payment"/>&nbsp;&nbsp;
+                             </form>
+
+                             {%else%}
+                             <button class="btn btn-default " disabled>  Proceed to payment</button>&nbsp;&nbsp;
+                             {%endif%}
+                        </form>
+             </div>
+
+           </div>
+
+         </div>
+        </div>
+
+       </div>
+
+
+{% endblock %}

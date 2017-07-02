@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Test game 1</title>
+<meta charset="utf-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+  "use strict";
+
+  var message_s = {
+    messageType: "SETTING",
+    options: {
+      "width": "80%",
+      "height": "80%"
+    }
+  };
+  window.parent.postMessage(message_s,"*");
+
+  $("#submit_score").click( function () {
+    var msg = {
+      "messageType": "SCORE",
+      "score": 5
+    };
+    window.parent.postMessage(msg, "*");
+  });
+
+});
+</script>
+</head>
+<body>
+<button id="submit_score">Submit score</button>
+</body>
+</html>
