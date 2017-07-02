@@ -1,10 +1,6 @@
-# CS-C3170 Web Software Development Group Project - Project plan and Final Submission Notes (2016-2017)
-Group members:
 Antti Koskimäki - 51301B,
 Sami Mahamoed - 544333,
 Paula Minni - 62686F
-
-# You can check our notes about the final submission at the end of the report in section 6
 
 # 1 - Project Goals
 
